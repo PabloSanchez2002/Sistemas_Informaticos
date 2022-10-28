@@ -1,0 +1,68 @@
+{% extends "base.html" %} {% block title %} {{ title }} {% endblock%}
+</form>
+{% block content %}
+<div class="move_left">
+    <img src="{{movie.poster|safe}}" alt="{{movie.titulo}}" id="{{movie.id}}" width="30%" height="25%" />
+    <div class="movie_text">
+        <h3>
+            {{ movie.titulo}}
+        </h3>
+        Director: {{ movie.director }}
+
+        <br></br>
+        <br></br>
+        Actores: {% for item in movie.actores %}
+        <div class="div_identa">
+            {{ item.nombre}}: {{item.personaje}}
+        </div>
+        {% endfor %}
+        <br></br>
+        <div> Valoracion: {%for i in range(valoracion)%}
+            <span>⭐</span> {% endfor %}
+        </div>
+        <br></br>
+        <br></br>
+        <br></br>
+        Categoria: {{movie.categoria}}
+        <br></br>
+        Precio: {{movie.precio}} €
+        <br></br>
+        <br></br>
+        {% if not session['usuario'] %}
+        <a href="{{ url_for('login')}}">
+            Inicie Sesión para valorar
+        </a>
+
+        {% else %}
+        {% if opinion != -1 %}
+        Tu opinion es: {{opinion}}
+        {% else %}
+        Todavía no has valorado
+        {% endif %}
+        <div class="review_bar">
+            <div>Pon tu opinion:</div>
+            <form action="" , method="post">
+                <select name="nota">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+                <input type="submit" value="Valorar">
+            </form>
+        </div>
+        {% endif%}
+    </p> El stock para esta pelicula es de: {{stock}} copias</p>
+        <form action="" method="post">
+            <label><b>Añadir al carrito</b></label>
+            <input name="valor" type="number" placeholder="Enter units">
+            <input type="submit" value="Añadir">
+
+    </div>
+
+
+
+</div>
+{% endblock %}

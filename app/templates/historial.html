@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ title }}
+{% endblock%}
+{% block content %}
+{% if pagado == True%}
+<script>alert("Tu pago se ha realizado correctamente!")</script>
+{%endif%}
+<div class="move_left">
+<h1>Este es tu historial de compras:</h1>
+<a href="{{ url_for('index')}}">
+    Volver
+</a>
+<br></br>
+{% for item in data['compras'] %}
+    <b>Fecha de compra: {{item.fecha}} </b>
+        {% for peli in item['pelis'] %}
+            <p>Id: {{peli.id}} </p>
+            <p>Titulo: {{peli.titulo}} </p>
+            <label>Nº de copias: {{peli.pedidos}} </label>
+    {% endfor %}
+    <p>Total del pedido: {{"%.2f"|format(item.sumatotal)}}€ </p>
+    <br></br>
+{% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ title }}
+{% endblock%}
+
+{% block content %}
+    <script src="static/script.js"></script>
+    <div class = "move_left">
+    <h1>Iniciar Sesión</h1>
+    <a href="{{ url_for('singup')}}">
+        No tengo cuenta
+     </a>
+     <br></br> 
+    <form action="" method="post">
+        <label><b>Username</b></label>
+        <input name="username" type="text" placeholder="Enter username">
+        <br></br>
+        <label><b>Password</b></label>
+        <input name="password" type="password" placeholder="Enter password">
+        <br></br>
+        <input type="submit" value="Login">
+    </form>
+{% endblock %}
