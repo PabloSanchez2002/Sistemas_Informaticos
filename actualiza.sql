@@ -1,0 +1,3 @@
+
+
+SELECT setCustomersBalance(100);
