@@ -1,9 +1,16 @@
 ########meterte postgres:
 sudo su - postgres 
 psql si1
+\cd ..
+\cd ..
+\cd home/pablo/public_html/
 
 ########Cosas:
 \cd directorio No empiezas en el raiz
+\cd ..
+\cd ..
+\cd home/pablo/public_html/
+
 \! pwd Usa esto para ver en que directorio estas
 \i actualiza.sql    //Ejecuta un archivo
 

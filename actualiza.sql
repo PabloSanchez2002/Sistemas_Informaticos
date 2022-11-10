@@ -10,10 +10,15 @@ ALTER TABLE imdb_movies ADD COLUMN ratingcount int DEFAULT 0;
 ALTER TABLE customers ALTER COLUMN password TYPE character varying(96);
 SELECT setCustomersBalance(100);
 
-CREATE TRIGGER updateratings
+CREATE OR REPLACE TRIGGER updateratingsADD
 AFTER INSERT ON ratings
 FOR EACH ROW
-EXECUTE PROCEDURE updateratingsfunc();
+EXECUTE PROCEDURE updateratingsfuncADD();
+
+CREATE OR REPLACE TRIGGER updateratingsDEL
+AFTER DELETE ON ratings
+FOR EACH ROW
+EXECUTE PROCEDURE updateratingsfuncDEL();
 
     
 
