@@ -1,0 +1,12 @@
+PK ===============================> FK                              IMPLEMENTADO
+imdb_actor.actorid                  imdb_actormivies.actorid        
+imdb_movies.movieid                 imdb_actormivies.movieid        
+inventory.prod_id                   orderdetail.prod_id             
+customers.customerid                orders.customerid                  
+
+
+NUEVAS CLAVES PRIMARIAS
+imdb_actormivies    => (actorid, movieid)
+orderdetail         => orderid 
+
+inventory qué almacena en prod_id??
