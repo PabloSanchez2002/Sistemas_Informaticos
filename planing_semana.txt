@@ -1,0 +1,17 @@
+1 - mejorar diagrama                    PABLO
+2 - terminar diseño en actualiza        PABLO
+3 - hacer querys: 
+        setPrice.sql                    ALVARO
+        setOrderAmonut.sql              PABLO
+        getTopSales.sql                 ALVARO
+        getTopActors.sql                PABLO
+HASTA AQUI SON 5 PTS :)
+
+Integridad de los datos:
+1 - Multievaluados                      ALVARO
+2 - Trigger updOrders                   ALVARO
+3 - updRatings                          PABLO
+4 - updInventoryAndCustomers            PABLO
+HASTA AQUI SON 7 PUNTOS :)
+
+PARTE PLATAFORMA ALVARO

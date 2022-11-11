@@ -1,0 +1,14 @@
+PK ===============================> FK                              IMPLEMENTADO
+imdb_actor.actorid                  imdb_actormovies.actorid        
+imdb_movies.movieid                 imdb_actormivies.movieid 
+imdb_movies.movieid                 products.movieid       
+products.prod_id                    inventory.prod_id                     
+products.prod_id                    orderdetail.prod_id                           
+customers.customerid                orders.customerid                  
+
+
+NUEVAS CLAVES PRIMARIAS
+imdb_actormivies    => (actorid, movieid)
+orderdetail         => orderid 
+
+  
