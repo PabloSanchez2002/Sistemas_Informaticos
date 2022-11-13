@@ -3,13 +3,13 @@
 3 - hacer querys: 
         setPrice.sql                    PABLO   HECHO
         setOrderAmonut.sql              PABLO   HECHO FALTA COMPROBAR
-        getTopSales.sql                 ALVARO  
+        getTopSales.sql                 ALVARO  EN ELLO
         getTopActors.sql                PABLO
 HASTA AQUI SON 5 PTS :)
 
 Integridad de los datos:
-1 - Multievaluados                      ALVARO
-2 - Trigger updOrders                   ALVARO
+1 - Multievaluados                      ALVARO  HECHO
+2 - Trigger updOrders                   ALVARO EN ELLO
 3 - updRatings                          PABLO   HECHO
 4 - updInventoryAndCustomers            PABLO
 HASTA AQUI SON 7 PUNTOS :)
