@@ -1,16 +1,16 @@
-1 - mejorar diagrama                    PABLO
-2 - terminar diseño en actualiza        PABLO
+1 - mejorar diagrama                    PABLO   FALTA REMODELARLO (YO LO HARIA AL FINAL)
+2 - terminar diseño en actualiza        PABLO   HECHO (PUEDE QUE FALTE MODIFICAR ALGUNA COSA SEGUN VAMOS AVANZANDO)
 3 - hacer querys: 
-        setPrice.sql                    ALVARO
-        setOrderAmonut.sql              PABLO
-        getTopSales.sql                 ALVARO
+        setPrice.sql                    PABLO   HECHO
+        setOrderAmonut.sql              PABLO   HECHO FALTA COMPROBAR
+        getTopSales.sql                 ALVARO  
         getTopActors.sql                PABLO
 HASTA AQUI SON 5 PTS :)
 
 Integridad de los datos:
 1 - Multievaluados                      ALVARO
 2 - Trigger updOrders                   ALVARO
-3 - updRatings                          PABLO
+3 - updRatings                          PABLO   HECHO
 4 - updInventoryAndCustomers            PABLO
 HASTA AQUI SON 7 PUNTOS :)
 

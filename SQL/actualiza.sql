@@ -17,8 +17,6 @@ ALTER TABLE imdb_movies ADD COLUMN ratingcount int DEFAULT 0;
 ALTER TABLE customers ALTER COLUMN password TYPE character varying(96);
 
 
-
-
 --Funcion de crear balances aleatorios
 CREATE OR REPLACE FUNCTION setCustomersBalance(IN initialBalance bigint) RETURNS void AS $$
 BEGIN
@@ -29,28 +27,48 @@ $$ LANGUAGE plpgsql;
 --Llamada a funcion setCustomersBalance
 SELECT setCustomersBalance(100);
 
+--Modificamos las FK existentes para que cumplasn ON DELETE CASCADE
+ALTER TABLE public.imdb_directormovies DROP CONSTRAINT imdb_directormovies_movieid_fkey;
+ALTER TABLE public.imdb_directormovies ADD CONSTRAINT imdb_directormovies_movieid_fkey FOREIGN KEY (movieid) REFERENCES public.imdb_movies(movieid) ON DELETE CASCADE;
+ALTER TABLE public.imdb_moviecountries DROP CONSTRAINT imdb_moviecountries_movieid_fkey;
+ALTER TABLE public.imdb_moviecountries ADD CONSTRAINT imdb_moviecountries_movieid_fkey FOREIGN KEY (movieid) REFERENCES public.imdb_movies(movieid) ON DELETE CASCADE;
+ALTER TABLE public.imdb_moviegenres DROP CONSTRAINT imdb_moviegenres_movieid_fkey;
+ALTER TABLE public.imdb_moviegenres ADD CONSTRAINT imdb_moviegenres_movieid_fkey FOREIGN KEY (movieid) REFERENCES public.imdb_movies(movieid) ON DELETE CASCADE;
+ALTER TABLE public.imdb_movielanguages DROP CONSTRAINT imdb_movielanguages_movieid_fkey;
+ALTER TABLE public.imdb_movielanguages ADD CONSTRAINT imdb_movielanguages_movieid_fkey FOREIGN KEY (movieid) REFERENCES public.imdb_movies(movieid) ON DELETE CASCADE;
+ALTER TABLE public.ratings DROP CONSTRAINT ratings_movieid_fkey;
+ALTER TABLE public.ratings ADD CONSTRAINT ratings_movieid_fkey FOREIGN KEY (movieid) REFERENCES public.imdb_movies(movieid) ON DELETE CASCADE;
 
 
 --Añadimos las claves primarias y las dependencias entre claves
-
-ALTER TABLE imdb_actormovies ADD CONSTRAINT FK_actorid FOREIGN KEY (actorid) REFERENCES imdb_actors(actorid);
-ALTER TABLE imdb_actormovies ADD CONSTRAINT FK_movieid FOREIGN KEY (movieid) REFERENCES imdb_movies(movieid);
-ALTER TABLE products ADD CONSTRAINT FK_movieid FOREIGN KEY (movieid) REFERENCES imdb_movies(movieid);
-ALTER TABLE inventory ADD CONSTRAINT FK_prod_id FOREIGN KEY (prod_id) REFERENCES products(prod_id);
-ALTER TABLE orderdetail ADD CONSTRAINT FK_prod_id FOREIGN KEY (prod_id) REFERENCES products(prod_id);
-ALTER TABLE orders ADD CONSTRAINT FK_customerid FOREIGN KEY (customerid) REFERENCES customers(customerid);
-ALTER TABLE orderdetail ADD CONSTRAINT FK_orderid FOREIGN KEY (orderid) REFERENCES orders(orderid);
+ALTER TABLE imdb_actormovies ADD CONSTRAINT FK_actorid FOREIGN KEY (actorid) REFERENCES imdb_actors(actorid) ON DELETE CASCADE;
+ALTER TABLE imdb_actormovies ADD CONSTRAINT FK_movieid FOREIGN KEY (movieid) REFERENCES imdb_movies(movieid) ON DELETE CASCADE;
+ALTER TABLE products ADD CONSTRAINT FK_movieid FOREIGN KEY (movieid) REFERENCES imdb_movies(movieid) ON DELETE CASCADE;
+ALTER TABLE inventory ADD CONSTRAINT FK_prod_id FOREIGN KEY (prod_id) REFERENCES products(prod_id) ON DELETE CASCADE;
+ALTER TABLE orderdetail ADD CONSTRAINT FK_prod_id FOREIGN KEY (prod_id) REFERENCES products(prod_id) ON DELETE CASCADE;
+ALTER TABLE orders ADD CONSTRAINT FK_customerid FOREIGN KEY (customerid) REFERENCES customers(customerid) ON DELETE CASCADE;
+ALTER TABLE orderdetail ADD CONSTRAINT FK_orderid FOREIGN KEY (orderid) REFERENCES orders(orderid) ON DELETE CASCADE;
 ALTER TABLE imdb_actormovies ADD CONSTRAINT PK_imdb_actormivies PRIMARY KEY (actorid,movieid);
-
---Eliminamos duplicados
-delete from orderdetail where prod_id not in (select prod_id from inventory);
+--Hay tuplas duplicadas por lo que debemos eliminar una de ellas para poder crear la Primary Key (orderid, prod_id)
+delete from orderdetail where prod_id not in (select prod_id from inventory); --Eliminamos duplicados
 ALTER TABLE orderdetail ADD CONSTRAINT PK_orderdetail Primary Key (orderid, prod_id); --> error por duplicadas
 
-/*Hay tuplas duplicadas por lo que debemos eliminar una de ellas para poder crear la Primary Key (orderid, prod_id)
- orderid | prod_id | price | quantity 
----------+---------+-------+----------
-    2663 |    4572 |       |        1
-    2663 |    4572 |       |        1
+--Eliminamos las peliculas varios años de produccion (complican calculso en la base de datos)
+DELETE FROM imdb_movies WHERE LENGTH(YEAR)>4;
+
+--Trigger para cuando se mete una valoracion
+CREATE OR REPLACE TRIGGER updateratingsADD
+AFTER INSERT ON ratings
+FOR EACH ROW
+EXECUTE PROCEDURE updateratingsfuncADD();
+
+--Trigger para cuando se elimina una valoracion
+CREATE OR REPLACE TRIGGER updateratingsDEL
+AFTER DELETE ON ratings
+FOR EACH ROW
+EXECUTE PROCEDURE updateratingsfuncDEL();
+
+/*
 
 with xd as(
 SELECT orderid, prod_id
@@ -85,22 +103,6 @@ select * from orderdetail where orderid = 2663 and prod_id = 4572;
 */
 
 
-
-
-
---Trigger para cuando se mete una valoracion
-CREATE OR REPLACE TRIGGER updateratingsADD
-AFTER INSERT ON ratings
-FOR EACH ROW
-EXECUTE PROCEDURE updateratingsfuncADD();
-
-
-
---Trigger para cuando se elimina una valoracion
-CREATE OR REPLACE TRIGGER updateratingsDEL
-AFTER DELETE ON ratings
-FOR EACH ROW
-EXECUTE PROCEDURE updateratingsfuncDEL();
 
     
 
