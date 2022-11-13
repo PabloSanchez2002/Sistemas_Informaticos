@@ -5,7 +5,7 @@ imdb_movies.movieid                 products.movieid                si
 products.prod_id                    inventory.prod_id               si    
 products.prod_id                    orderdetail.prod_id             si              
 customers.customerid                orders.customerid               si 
-
+orders.orderid                      orderdetail.orderid
 
 NUEVAS CLAVES PRIMARIAS
 imdb_actormovies    => (actorid, movieid)
