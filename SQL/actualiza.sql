@@ -1,3 +1,8 @@
+--Hacemos las llamadas necsarias para los procedimientos almacenados
+\i updOrders.sql
+\i updRatings.sql
+\i setOrderAmount.sql
+
 --Añadimos valor balance a customer
 ALTER TABLE customers ADD COLUMN balance int;
 
@@ -69,6 +74,19 @@ CREATE OR REPLACE TRIGGER updateratings
 AFTER DELETE OR INSERT ON ratings
 FOR EACH ROW
 EXECUTE PROCEDURE updateratingsfunc();
+
+--Query setPrice.sql 
+\i setPrice.sql
+
+
+--Llamada a setOrderAmount()
+select setOrderAmount();
+
+--Tablas del catalogos para la informacion de las peliculas
+CREATE TABLE imdb_catalogolanguage (
+    id SERIAL PRIMARY KEY,
+    language character varying(32) NOT NULL UNIQUE
+);
 
 INSERT INTO imdb_catalogolanguage (language) select DISTINCT language from imdb_movielanguages;
 UPDATE imdb_movielanguages SET language = cm.id from imdb_catalogolanguage cm where cm.language = imdb_movielanguages.language;

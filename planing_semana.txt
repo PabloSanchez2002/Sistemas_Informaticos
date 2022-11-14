@@ -2,7 +2,7 @@
 2 - terminar diseño en actualiza        PABLO   HECHO (PUEDE QUE FALTE MODIFICAR ALGUNA COSA SEGUN VAMOS AVANZANDO)
 3 - hacer querys: 
         setPrice.sql                    PABLO   HECHO
-        setOrderAmonut.sql              PABLO   HECHO FALTA COMPROBAR
+        setOrderAmonut.sql              PABLO   HECHO
         getTopActors.sql                ALVARO  HECHO
         getTopSales.sql                 ALVARO  HECHO
 HASTA AQUI SON 5 PTS :)
@@ -11,7 +11,7 @@ Integridad de los datos:
 1 - Multievaluados                      ALVARO  HECHO
 2 - Trigger updOrders                   ALVARO  En ELLO
 3 - updRatings                          PABLO   HECHO
-4 - updInventoryAndCustomers            PABLO
+4 - updInventoryAndCustomers            PABLO   en ello
 HASTA AQUI SON 7 PUNTOS :)
 
 PARTE PLATAFORMA ALVARO
