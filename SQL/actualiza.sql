@@ -64,23 +64,11 @@ ALTER TABLE orderdetail ADD CONSTRAINT PK_orderdetail Primary Key (orderid, prod
 --Eliminamos las peliculas varios años de produccion (complican calculso en la base de datos)
 DELETE FROM imdb_movies WHERE LENGTH(YEAR)>4;
 
---Trigger para cuando se mete una valoracion
+--Trigger para cuando se mete o elimina una valoracion
 CREATE OR REPLACE TRIGGER updateratings
 AFTER DELETE OR INSERT ON ratings
 FOR EACH ROW
 EXECUTE PROCEDURE updateratingsfunc();
-/*
---Trigger para cuando se elimina una valoracion
-CREATE OR REPLACE TRIGGER updateratingsDEL
-AFTER DELETE ON ratings
-FOR EACH ROW
-EXECUTE PROCEDURE updateratingsfuncDEL();
-
-CREATE TABLE imdb_catalogolanguage (
-    id SERIAL PRIMARY KEY,
-    language character varying(32) NOT NULL UNIQUE
-);
-*/
 
 INSERT INTO imdb_catalogolanguage (language) select DISTINCT language from imdb_movielanguages;
 UPDATE imdb_movielanguages SET language = cm.id from imdb_catalogolanguage cm where cm.language = imdb_movielanguages.language;
