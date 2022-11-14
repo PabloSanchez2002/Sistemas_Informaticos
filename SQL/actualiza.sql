@@ -73,6 +73,34 @@ AFTER DELETE ON ratings
 FOR EACH ROW
 EXECUTE PROCEDURE updateratingsfuncDEL();
 
+CREATE TABLE imdb_catalogolanguage (
+    id SERIAL PRIMARY KEY,
+    language character varying(32) NOT NULL UNIQUE
+);
+
+INSERT INTO imdb_catalogolanguage (language) select DISTINCT language from imdb_movielanguages;
+UPDATE imdb_movielanguages SET language = cm.id from imdb_catalogolanguage cm where cm.language = imdb_movielanguages.language;
+ALTER TABLE imdb_movielanguages ALTER COLUMN language TYPE int USING language::integer;
+ALTER TABLE imdb_movielanguages ADD CONSTRAINT foreign_key FOREIGN KEY(language) REFERENCES imdb_catalogolanguage(id);
+
+CREATE TABLE imdb_catalogocountries (
+    id SERIAL PRIMARY KEY, 
+    countries character varying(32) NOT NULL UNIQUE
+);
+INSERT INTO imdb_catalogocountries(countries) select DISTINCT country from imdb_moviecountries;
+UPDATE imdb_moviecountries SET country = cm.id from imdb_catalogocountries cm where cm.countries = imdb_moviecountries.country;
+ALTER TABLE imdb_moviecountries ALTER COLUMN country TYPE int USING country::integer;
+ALTER TABLE imdb_moviecountries ADD CONSTRAINT foreign_key FOREIGN KEY(country) REFERENCES imdb_catalogocountries(id);
+
+CREATE TABLE imdb_catalogogenres(
+    id SERIAL PRIMARY KEY,
+    genres character varying(32) NOT NULL UNIQUE
+);
+INSERT INTO imdb_catalogogenres(genres) select DISTINCT genre from imdb_moviegenres;
+UPDATE imdb_moviegenres SET genre = cm.id from imdb_catalogogenres cm where cm.genres = imdb_moviegenres.genre;
+ALTER TABLE imdb_moviegenres ALTER COLUMN genre TYPE int USING genre::integer;
+ALTER TABLE imdb_moviegenres ADD CONSTRAINT foreign_key FOREIGN KEY(genre) REFERENCES imdb_catalogogenres(id);
+
 /*
 
 with xd as(
