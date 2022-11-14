@@ -38,10 +38,13 @@ ALTER TABLE public.imdb_movielanguages DROP CONSTRAINT imdb_movielanguages_movie
 ALTER TABLE public.imdb_movielanguages ADD CONSTRAINT imdb_movielanguages_movieid_fkey FOREIGN KEY (movieid) REFERENCES public.imdb_movies(movieid) ON DELETE CASCADE;
 ALTER TABLE public.ratings DROP CONSTRAINT ratings_movieid_fkey;
 ALTER TABLE public.ratings ADD CONSTRAINT ratings_movieid_fkey FOREIGN KEY (movieid) REFERENCES public.imdb_movies(movieid) ON DELETE CASCADE;
-ALTER TABLE public.products  DROP CONSTRAINT products_movieid_fkey;        
+ALTER TABLE public.products  DROP CONSTRAINT products_movieid_fkey;   
+ALTER TABLE public.ratings DROP CONSTRAINT ratings_customerid_fkey;
+ALTER TABLE public.ratings ADD CONSTRAINT ratings_customerid_fkey FOREIGN KEY (customerid) REFERENCES public.customers(customerid) ON DELETE CASCADE;
+
 
 --Añadimos las claves primarias y las dependencias entre claves
-ALTER TABLE imdb_actormovies ADD CONSTRAINT FK_actorid FOREIGN KEY (actorid) REFERENCES imdb_actors(actorid) ON DELETE CASCADE;
+ALTER TABLE imdb_actormovies ADD CONSTRAINT FK_actorid FOREIGN KEY (actorid) REFERENCES imdb_actors(actorid);
 ALTER TABLE imdb_actormovies ADD CONSTRAINT FK_movieid FOREIGN KEY (movieid) REFERENCES imdb_movies(movieid) ON DELETE CASCADE;
 ALTER TABLE products ADD CONSTRAINT FK_movieid FOREIGN KEY (movieid) REFERENCES imdb_movies(movieid) ON DELETE CASCADE;
 ALTER TABLE inventory ADD CONSTRAINT FK_prod_id FOREIGN KEY (prod_id) REFERENCES products(prod_id) ON DELETE CASCADE;
@@ -101,39 +104,6 @@ UPDATE imdb_moviegenres SET genre = cm.id from imdb_catalogogenres cm where cm.g
 ALTER TABLE imdb_moviegenres ALTER COLUMN genre TYPE int USING genre::integer;
 ALTER TABLE imdb_moviegenres ADD CONSTRAINT foreign_key FOREIGN KEY(genre) REFERENCES imdb_catalogogenres(id);
 
-/*
-
-with xd as(
-SELECT orderid, prod_id
-FROM orderdetail
-GROUP BY orderid, prod_id
-HAVING COUNT(orderid) > 1)
-
-select * from xd;
-
-with xd as(
-SELECT orderid, prod_id, quantity, COUNT(orderid)
-FROM orderdetail
-GROUP BY orderid, prod_id, quantity
-HAVING COUNT(orderid) > 1)
-
-IF EXISTS (xdd)
-   DELETE FROM dbo.duplicateTest WHERE ID = @id
-END IF;
-
-
-delete from orderdetail where (orderid, prod_id) in (
-    SELECT orderid, prod_id
-    FROM orderdetail
-    GROUP BY orderid, prod_id
-    HAVING COUNT(orderid) > 1);
-
-
-delete from orderdetail where prod_id not in (select prod_id from inventory); 
-
-select * from orderdetail where orderid = 67200 and prod_id = 2915;
-select * from orderdetail where orderid = 2663 and prod_id = 4572;
-*/
 
 
 

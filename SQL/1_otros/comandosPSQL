@@ -6,8 +6,8 @@ psql si1
 \cd home/pablo/public_html/SQL/
 
 ####Eliminar base de datos
-drop echema public cascade
-create schema public
+drop schema public cascade;
+create schema public;
 gunzip -c dump_v1.7.sql.gz | psql -U alumnodb si1
 
 ########Cosas:

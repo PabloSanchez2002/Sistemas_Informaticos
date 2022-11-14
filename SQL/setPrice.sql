@@ -1,19 +1,8 @@
 
-            WITH anno as (
-                select(values (date_part('year',(SELECT current_timestamp)))) as ann),
-            calc as(
-                select movieid, year, (anno.ann - CAST( year AS INT)) as age 
-                from imdb_movies, anno)
-            
-            select age from calc;
+    update orderdetail
+    set price = aux.precio from (
+    select orderid, o2.prod_id, round (p.price/(1.02^((extract (year from current_date) - extract (year from orderdate)))), 2) as precio 
+    from orders as ord natural join orderdetail as ord2 join products as p on p.prod_id = o2.prod_id) as aux
 
+    where orderdetail.prod_id = aux.prod_id and orderdetail.orderid = aux.orderid;
 
-            /*
-            UPDATE orderdetail ord
-                SET price = precios.price
-                from (select orderdetail.orderid, orderdetail.prod_id, products.price, from orderdetail
-                    orderdetail join products on orderdetail.prod_id = products.prod_id) as precios
-            
-                WHERE ord.orderid = precios.orderid; */
-
-    
