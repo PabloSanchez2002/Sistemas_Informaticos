@@ -1,13 +1,19 @@
-CREATE OR REPLACE FUNCTION updateratingsfuncADD() 
+CREATE OR REPLACE FUNCTION updateratingsfunc() 
 RETURNS TRIGGER as $$
 BEGIN
-    UPDATE imdb_movies SET ratingcount = (select count(customerid) from ratings WHERE movieid = new.movieid) WHERE movieid = new.movieid ;
-    UPDATE imdb_movies SET ratingmean = (select avg(rated) from ratings WHERE movieid = new.movieid) WHERE movieid = new.movieid;
+    IF (TG_OP = 'INSERT') THEN
+        UPDATE imdb_movies SET ratingcount = (select count(customerid) from ratings WHERE movieid = new.movieid) WHERE movieid = new.movieid ;
+        UPDATE imdb_movies SET ratingmean = (select avg(rated) from ratings WHERE movieid = new.movieid) WHERE movieid = new.movieid;
+    ELSEIF (TG_OP = 'DELETE') THEN    
+        UPDATE imdb_movies SET ratingcount = (select count(customerid) from ratings WHERE movieid = old.movieid) WHERE movieid = old.movieid ;
+        UPDATE imdb_movies SET ratingmean = (select avg(rated) from ratings WHERE movieid = old.movieid) WHERE movieid = old.movieid;
+    END IF;
     RETURN NULL; 
 END;
 $$ 
 LANGUAGE 'plpgsql';
 
+/*
 CREATE OR REPLACE FUNCTION updateratingsfuncDEL() 
 RETURNS TRIGGER as $$
 BEGIN
@@ -17,6 +23,6 @@ BEGIN
 END;
 $$ 
 LANGUAGE 'plpgsql';
+*/
 
---revisar tgop
 
