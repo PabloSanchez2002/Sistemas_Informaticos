@@ -9,7 +9,7 @@ HASTA AQUI SON 5 PTS :)
 
 Integridad de los datos:
 1 - Multievaluados                      ALVARO  HECHO
-2 - Trigger updOrders                   ALVARO  En ELLO
+2 - Trigger updOrders                   ALVARO  HECHO
 3 - updRatings                          PABLO   HECHO
 4 - updInventoryAndCustomers            PABLO   en ello
 HASTA AQUI SON 7 PUNTOS :)

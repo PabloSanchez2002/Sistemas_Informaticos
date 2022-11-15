@@ -71,14 +71,14 @@ DELETE FROM imdb_movies WHERE LENGTH(YEAR)>4;
 
 --Trigger para cuando se mete o elimina una valoracion
 CREATE OR REPLACE TRIGGER updateratings
-AFTER DELETE OR INSERT ON ratings
+AFTER DELETE OR INSERT OR UPDATE ON ratings
 FOR EACH ROW
 EXECUTE PROCEDURE updateratingsfunc();
 
 --Query setPrice.sql 
 \i setPrice.sql
 
-
+\i setOrderAmount.sql
 --Llamada a setOrderAmount()
 select setOrderAmount();
 
