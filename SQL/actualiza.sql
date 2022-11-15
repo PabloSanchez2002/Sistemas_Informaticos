@@ -1,6 +1,5 @@
 --Hacemos las llamadas necsarias para los procedimientos almacenados
 \i updOrders.sql
-\i updRatings.sql
 \i setOrderAmount.sql
 
 --Añadimos valor balance a customer
@@ -13,6 +12,9 @@ CREATE TABLE ratings (
     rated int not null check(rated >= 0 and rated <= 5),
     PRIMARY KEY(customerid, movieid)
 );
+
+--Llamada para generar los procedimientos almacenados de ratings
+\i updRatings.sql
 
 --Añadimos columnas a tabla imdb_movies
 ALTER TABLE imdb_movies ADD COLUMN ratingmean int DEFAULT 0;
@@ -69,16 +71,12 @@ ALTER TABLE orderdetail ADD CONSTRAINT PK_orderdetail Primary Key (orderid, prod
 --Eliminamos las peliculas varios años de produccion (complican calculso en la base de datos)
 DELETE FROM imdb_movies WHERE LENGTH(YEAR)>4;
 
---Trigger para cuando se mete o elimina una valoracion
-CREATE OR REPLACE TRIGGER updateratings
-AFTER DELETE OR INSERT OR UPDATE ON ratings
-FOR EACH ROW
-EXECUTE PROCEDURE updateratingsfunc();
-
 --Query setPrice.sql 
 \i setPrice.sql
 
+--Funcion setOrderAmount
 \i setOrderAmount.sql
+
 --Llamada a setOrderAmount()
 select setOrderAmount();
 

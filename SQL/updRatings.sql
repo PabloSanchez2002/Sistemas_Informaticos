@@ -15,5 +15,11 @@ END;
 $$ 
 LANGUAGE 'plpgsql';
 
+--Trigger para cuando se mete o elimina una valoracion
+CREATE OR REPLACE TRIGGER updateratings
+AFTER DELETE OR INSERT OR UPDATE ON ratings
+FOR EACH ROW
+EXECUTE PROCEDURE updateratingsfunc();
+
 
 

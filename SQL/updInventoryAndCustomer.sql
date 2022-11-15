@@ -1,4 +1,3 @@
--- Procedimiento que es llamado por el trigger
 CREATE OR REPLACE FUNCTION updInventory() RETURNS TRIGGER AS $$
 DECLARE
     prod record;
@@ -27,9 +26,13 @@ BEGIN
         -- En caso de que no haya stock, añadimos una alerta
         IF (prod.quantity >= prod.stock) THEN
             INSERT INTO alertas
-            VALUES (prod.prod_id, NOW(), prod.stock - prod.quantity);*/
+            VALUES (prod.prod_id, NOW(), prod.stock - prod.quantity);
         END IF;
+        */
     END LOOP;
+    --Quitamos del saldo del cliente el precio del pedido 
+    UPDATE customers set
+        balance = balance - old.totalamount;
 
     -- Actualizamos el orderdate de la tabla orders
     NEW.orderdate = 'NOW()';
@@ -47,4 +50,8 @@ FOR EACH ROW
     WHEN (NEW.status = 'Paid')
     EXECUTE PROCEDURE updInventory();
 
-    UPDATE public.orders SET orderdate='2022-11-14', customerid=2823, netamount=50, tax=15, totalamount=50, status='Paid' WHERE orderid=36992;
+/* PARA PROBAR COSAS
+select * from customers where customerid = 9557;
+UPDATE public.orders SET customerid=9557,  status='Paid' WHERE orderid=123456;
+select * from orders where orderid=123456;
+*/
