@@ -8,7 +8,7 @@ psql si1
 ####Eliminar base de datos
 drop schema public cascade;
 create schema public;
-\
+
 ########Cosas:
 \cd directorio No empiezas en el raiz
 \cd ..

@@ -1,9 +1,3 @@
---Hacemos las llamadas necsarias para los procedimientos almacenados
-\i updOrders.sql
-\i updRatings.sql
-\i setOrderAmount.sql
-
-
 --Añadimos valor balance a customer
 ALTER TABLE customers ADD COLUMN balance int;
 
@@ -18,23 +12,29 @@ CREATE TABLE ratings (
 --Llamada para generar los procedimientos almacenados de ratings
 
 --Añadimos columnas a tabla imdb_movies
-ALTER TABLE imdb_movies ADD COLUMN ratingmean ;
-ALTER TABLE imdb_movies ADD COLUMN ratingcount ;
+ALTER TABLE imdb_movies ADD COLUMN ratingmean int;
+ALTER TABLE imdb_movies ADD COLUMN ratingcount int;
 
 update imdb_movies set ratingmean = 0;
 update imdb_movies set ratingcount = 0;
-update imdb_movies set movierelease = year
+update imdb_movies set movierelease = year;
 
 --Cambiamos el tipo de password a 96 caracteres
 ALTER TABLE customers ALTER COLUMN password TYPE character varying(96);
 SELECT setval('customers_customerid_seq', (SELECT max(customerid) FROM customers));
  SELECT setval('orders_orderid_seq', (SELECT max(orderid) FROM orders));
+ 
 --Funcion de crear balances aleatorios
 CREATE OR REPLACE FUNCTION setCustomersBalance(IN initialBalance bigint) RETURNS void AS $$
 BEGIN
     UPDATE customers SET balance = floor(random()*initialBalance); 
 END;
 $$ LANGUAGE plpgsql;
+
+--Hacemos las llamadas necsarias para los procedimientos almacenados
+\i updOrders.sql
+\i updRatings.sql
+\i setOrderAmount.sql
 
 --Llamada a funcion setCustomersBalance
 SELECT setCustomersBalance(100);
@@ -54,7 +54,6 @@ ALTER TABLE public.products  DROP CONSTRAINT products_movieid_fkey;
 ALTER TABLE public.ratings DROP CONSTRAINT ratings_customerid_fkey;
 ALTER TABLE public.ratings ADD CONSTRAINT ratings_customerid_fkey FOREIGN KEY (customerid) REFERENCES public.customers(customerid) ON DELETE CASCADE;
 
-
 --Añadimos las claves primarias y las dependencias entre claves
 ALTER TABLE imdb_actormovies ADD CONSTRAINT FK_actorid FOREIGN KEY (actorid) REFERENCES imdb_actors(actorid);
 ALTER TABLE imdb_actormovies ADD CONSTRAINT FK_movieid FOREIGN KEY (movieid) REFERENCES imdb_movies(movieid) ON DELETE CASCADE;
@@ -64,6 +63,7 @@ ALTER TABLE orderdetail ADD CONSTRAINT FK_prod_id FOREIGN KEY (prod_id) REFERENC
 ALTER TABLE orders ADD CONSTRAINT FK_customerid FOREIGN KEY (customerid) REFERENCES customers(customerid) ON DELETE CASCADE;
 ALTER TABLE orderdetail ADD CONSTRAINT FK_orderid FOREIGN KEY (orderid) REFERENCES orders(orderid) ON DELETE CASCADE;
 ALTER TABLE imdb_actormovies ADD CONSTRAINT PK_imdb_actormivies PRIMARY KEY (actorid,movieid);
+
 --Hay tuplas duplicadas por lo que debemos eliminar una de ellas para poder crear la Primary Key (orderid, prod_id)
 delete from orderdetail where (orderid, prod_id) in (
     SELECT orderid, prod_id

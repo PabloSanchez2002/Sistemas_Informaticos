@@ -14,7 +14,7 @@ db_table_movies = Table('imdb_movies', db_meta, autoload=True, autoload_with=db_
 
 def db_createUser(dict):
     try:# conexion a la base de datos
-        db_conn = None
+            
         db_conn = db_engine.connect()
         x =  db_conn.execute(f"select * from customers where username = '{dict['user']}'")
         if len(list(x)) > 0:
@@ -431,3 +431,17 @@ def db_listOfMovies1949():
         print("-"*60)
 
         return 'Something is broken'
+
+
+def db_shoppingHistory(username):
+    try:
+        # conexion a la base de datos
+        db_conn = None
+        db_conn = db_engine.connect()
+        db_result = db_conn.execute(
+            "select orderid, orderdate, totalamount, status from orders where username='%s'" % username)
+
+        db_conn.close()
+    except:
+        if db_conn is not None:
+            db_conn.close()

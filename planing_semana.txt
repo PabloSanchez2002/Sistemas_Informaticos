@@ -15,3 +15,10 @@ Integridad de los datos:
 HASTA AQUI SON 7 PUNTOS :)
 
 PARTE PLATAFORMA ALVARO
+
+////COSAS QUE FALTAN\\\\\\\
+1 - Historial de compras                                PABLO 
+2 - Comprobar su correcto funcionamiento con apache     JUNTOS
+3 - Memoria                                             PABLO + AÑADE COMENTARIOS ALVARO
+
+¡¡¡¡Dar una revision completa al funcionamiento de la plataforma!!!!
