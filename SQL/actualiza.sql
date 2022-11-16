@@ -27,8 +27,8 @@ update imdb_movies set movierelease = year
 
 --Cambiamos el tipo de password a 96 caracteres
 ALTER TABLE customers ALTER COLUMN password TYPE character varying(96);
-
-
+SELECT setval('customers_customerid_seq', (SELECT max(customerid) FROM customers));
+ SELECT setval('orders_orderid_seq', (SELECT max(orderid) FROM orders));
 --Funcion de crear balances aleatorios
 CREATE OR REPLACE FUNCTION setCustomersBalance(IN initialBalance bigint) RETURNS void AS $$
 BEGIN

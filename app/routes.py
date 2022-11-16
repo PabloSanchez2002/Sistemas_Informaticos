@@ -8,6 +8,7 @@ import random
 import traceback
 from app import app
 from flask import render_template, request, url_for, redirect, session
+from app import database
 import hashlib
 import json
 import os
@@ -17,60 +18,48 @@ import datetime
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-    if "carrito" not in session:
-        session["carrito"] = []
-        session.modified = True
+    show_movies=database.db_initMovies()
+    return render_template('index.html', title = "Home", movies=show_movies)
+@app.route('/bestmovies', methods=['GET', 'POST'])
+def bestmovies():
+    topMovies=[]
 
-    inventario_data = open(os.path.join(app.root_path,'inventario/inventario.json'), encoding="utf-8").read()
-    inventario = json.loads(inventario_data)
-    inventarioSearch = []
-    inventarioSearchv2 = []
-    if 'categorias' in request.form:
-        if request.form['categorias'] == "":
-             if 'titulo' in request.form:
-                if request.form['titulo'] == "":
-                    return render_template('index.html', title = "Home", movies=inventario['peliculas'])
-                for i in inventario['peliculas']:
-                    if request.form['titulo'] in i['titulo'] :
-                        inventarioSearch.append(i)
-                return render_template('index.html', title = "Home", movies=inventarioSearch)
-        for i in inventario['peliculas']:
-            if i['categoria'] == request.form['categorias']:
-                inventarioSearch.append(i)
-        if 'titulo' in request.form:
-            if request.form['titulo'] == "":
-                return render_template('index.html', title = "Home", movies=inventarioSearch)
-            for i in inventarioSearch:
-                if request.form['titulo'] in i['titulo'] :
-                    inventarioSearchv2.append(i)
-            return render_template('index.html', title = "Home", movies=inventarioSearchv2)
-        return render_template('index.html', title = "Home", movies=inventarioSearch)
-    return render_template('index.html', title = "Home", movies=inventario['peliculas'])
-
+    if 'year1' in request.form and 'year2' in request.form:
+        try:
+            topMovies = database.db_topMovies(request.form['year1'], request.form['year2'], int(request.form['max'])) 
+        except:
+            topMovies = database.db_topMovies(request.form['year1'], request.form['year2'], 10) 
+    return render_template('bestmovies.html', title = "Home", top=topMovies)
+ 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     # doc sobre request object en http://flask.pocoo.org/docs/1.0/api/#incoming-request-data
     if ('username' in request.form):
         print(request.form['username'])
         # aqui se deberia validar con fichero .dat del usuario
-        path = os.path.join(app.root_path, "si1users")
-        path = os.path.join(path, str(request.form['username']))
-        print(path)
-        if os.path.exists(path):
+        password = database.db_getPassword(request.form['username'])
+        if len(password) != 0 and (password[0][0] == request.form['password'] or hashlib.sha3_384(request.form['password'].encode('utf-8')).hexdigest() == password[0][0]):
+            session['saldo'] = password[0][1]
+            session['usuario'] = request.form['username']
+            session['userid'] = password[0][2]
+            session.modified=True
+            flag = database.db_checkCarrito(password[0][2])
+            if flag == 0:
+                #no hay carrito del usuario
+                order=database.db_createCarrito(password[0][2])
+                if 'carrito' in session:
+                    for i in session['carrito']:
+                        database.db_insertCarrito(i, order)
+                    session.pop('carrito', None)
+            else:
+                if 'carrito' in session:
+                    for i in session['carrito']:
+                        print(i)
+                        database.db_updateCarrito(i,password[0][2])
+                    session.pop('carrito', None)
 
-            print ("HOLLAAA", file=sys.stderr)
-            path = os.path.join(path, "userdata.json")
-            with open(path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-                if data["contrasena"] == hashlib.sha3_384(request.form['password'].encode('utf-8')).hexdigest():
-                    session['saldo'] = data['saldo']
-                    session['usuario'] = request.form['username']
-                    session.modified=True
-                    # se puede usar request.referrer para volver a la pagina desde la que se hizo login
-                    return redirect(url_for('index'))
-                else:
-                    # aqui se le puede pasar como argumento un mensaje de login invalido
-                    return render_template('login.html', title = "Sign In")
+            # se puede usar request.referrer para volver a la pagina desde la que se hizo login
+            return redirect(url_for('index'))
         else:
             # se puede guardar la pagina desde la que se invoca 
             session['url_origen']=request.referrer
@@ -90,147 +79,100 @@ def login():
 def logout():
     session.pop('usuario', None)
     session.pop('carrito', None)
+    session.pop('userid', None)
     session.pop('saldo', None)
     return redirect(url_for('index'))
 
 
 @app.route('/almacen<id>', methods=["GET", "POST"])
 def almacen(id):
-    nota = "No has valorado esta peli"
-
     if "nota" in request.form:
+        database.db_actMovie(id, session['userid'], request.form['nota'])
+    movie_found=database.db_getMovie(id)
+    genres = database.db_getGenres(id)
+    price = database.db_getPrice(id)
+    print(genres)
+    print(price)
+    #Obtener valoracion
+    if "tipopelicula" in request.form:
+        if request.form['tipopelicula'] != -1:
+            index = int(int(request.form['tipopelicula']) - 1)
+            if 'usuario' in session:
+                database.db_addMovie(session['userid'], price[index][2], price[index][1])
+                pass
+            else: 
+                if 'carrito' not in session:
+                   session["carrito"] = []
+                   session.modified = True
+                for i in session['carrito']:
+                    if i['prod_id'] == price[index][2]:
+                        i['quantity'] += 1
+                        return redirect(url_for('index'))
+                dict = {}
+                dict['prod_id'] = price[index][2]
+                dict['movietitle'] = movie_found[0][0][0]
+                dict['price'] = price[index][1]
+                dict['quantity'] = 1
+                session['carrito'].append(dict)
+                print(dict)
+                return redirect(url_for('index'))
 
-        path = os.path.join(app.root_path, 'inventario/inventario.json')
+                    
 
-
-        inventario_data = open(path).read()
-        with open(path, "w") as output:
-            config = json.loads(inventario_data)
-            for i in config['peliculas']:
-                if int(i['id']) == int(id):
-                    movie_id = i
-                    break
-            flag = 0
-            for i in config["peliculas"][movie_id["id"]-1]["valoraciones"]:
-                if i["user"] == session['usuario']:
-                    i['valoracion'] = int(request.form['nota'])
-                    flag = 1
-                    break
-            if flag == 0:
-                val = {"user": session['usuario'], "valoracion": int(request.form['nota'])}
-                config["peliculas"][movie_id["id"]-1]["valoraciones"].append(val)
-            output.seek(0)        # <--- should reset file position to the beginning.
-            json.dump(config, output)
-            output.truncate()     # remove remaining part
-        
-        nota = request.form['nota']
-        average = 0 
-        k = 0
-        for j in movie_id['valoraciones']:
-            average += j['valoracion']
-            k += 1
-            break
-        try:
-            average = average / k
-        except:
-            average = 0
-        
-        stock = movie_id['stock']
-        return render_template('peliculas.html', title="almacen" + id, movie=movie_id, valoracion=round(average), opinion=nota, stock = stock)
-       
-    nota = -1
-    inventario_data = open(os.path.join(
-        app.root_path, 'inventario/inventario.json'), encoding="utf-8").read()
-    inventario = json.loads(inventario_data)
-    for i in inventario['peliculas']:
-        if int(i['id']) == int(id):
-            movie_id = i
-            average = 0
-            k = 0
-            for j in i['valoraciones']:
-                average += j['valoracion']
-                k += 1
-            break
-    try:
-        average = average / k
-    except:
-        average = 0
-    if "usuario" in session: 
-        for i in inventario["peliculas"][movie_id["id"]-1]["valoraciones"]:
-                if i["user"] == session['usuario']:
-                    nota = i['valoracion']
-                    break
-    if "valor" in request.form:
-
-        try:
-            if int(request.form['valor']) > 0: 
-                pelicula = movie_id
-                stock = movie_id['stock']
-                for i in session["carrito"]:
-                    if i['id'] == movie_id['id']:
-                        i["pedidos"] += int(request.form["valor"])
-                        return render_template('peliculas.html', title="almacen" + id, movie=movie_id, valoracion=round(average), opinion=nota, stock = stock)
-                if "carrito" not in session:
-                    session["carrito"] = []
-                    session.modified = True
-                pelicula["pedidos"] = int(request.form["valor"])
-                session["carrito"].append(pelicula)
-        except:
-            pass
-    stock = movie_id['stock']
-    return render_template('peliculas.html', title="almacen" + id, movie=movie_id, valoracion=round(average), opinion=nota, stock = stock)
+    return render_template('peliculas.html',title="almacen" + id,id= movie_found[0][0][1],genre=genres,prices=price, directors=movie_found[2], actors=movie_found[1], movietitle=movie_found[0][0][0], valoracion=movie_found[0][0][2], opinion=0, stock = movie_found[0][0][3])
     
 @app.route('/singup',methods=["GET", "POST"])
 def singup():
     if "submit_button" in request.form:
         dict = {}
-        directory = request.form['user']
-        parent_dir = app.root_path
-        parent_dir = os.path.join(parent_dir, 'si1users')
-        path = os.path.join(parent_dir, directory)
-        if(os.path.exists(path) == True):
-            return render_template('singup.html', error = True)
-        os.mkdir(path)
-        os.chmod(path, 0o777)
         dict["user"] = request.form['user']
         dict["email"] = request.form['email']
         dict["contrasena"] = hashlib.sha3_384(request.form['contraseña'].encode('utf-8')).hexdigest()
         dict["tarjeta"] = request.form['tarjeta']
         dict["direccion"] = request.form['direccion']
         dict["saldo"] = random.randint(0,50)
-        path_2 = os.path.join(path, "userdata.json")
-        f = open (path_2, 'w', encoding='utf-8') 
-        os.chmod(path_2, 0o777)
-        f.close()
-        with open (path_2, 'w', encoding='utf-8') as fp:
-            json.dump(dict, fp)
-
-        path_2 = os.path.join(path, "compras.json")
-        f = open (path_2, 'w', encoding='utf-8') 
-        
-        os.chmod(path_2, 0o777)
-        f.close()
+        flag = database.db_createUser(dict)
+        if flag == 1:
+            return render_template('singup.html', error = True) 
         return redirect(url_for('index'), )
     return render_template('singup.html', error = False) 
 
 @app.route('/carrito', methods=["GET", "POST"])
 def carrito():
+    if "carrito" in session:
         id = int(request.args.get('id',None))
         for i in range(len(session["carrito"])):
-            if session["carrito"][i]["id"] == id:
+            if session["carrito"][i]["prod_id"] == id:
                 session["carrito"].pop(i)
                 break
-        if "carrito" in session:
-            data = session["carrito"]
-            if len(data) == 0:
-                return render_template('carrito.html', datos=None, check = 0)
-            
-            price = 0 
-            for item in data:
-                price = price + (item["precio"] * item["pedidos"]) 
+        data = session["carrito"]
+        if len(data) == 0:
+            return render_template('carrito.html', datos=None, check = 0)
 
-            return render_template('carrito.html', datos=data, check = 1, precio = ("%.2f" % price))
-        return render_template('carrito.html', datos=None, check = 0, precio = None)
+        price = 0 
+        for item in data:
+            price = price + (item["price"] * item["quantity"]) 
+        return render_template('carrito.html', datos=data, check = 1, precio = ("%.2f" % price))
+    elif "usuario" in session:
+        carrito = database.db_getCarrito(session['userid'])
+        data = []
+        for i in carrito:
+            dict = {} 
+            dict['prod_id'] = i[0]
+            dict['movietitle'] = i[1] 
+            dict['price'] = i[2] 
+            dict['quantity'] =  i[3] 
+            data.append(dict) 
+
+        if len(data) == 0:
+            return render_template('carrito.html', datos=None, check = 0)
+
+        price = 0 
+        for item in data:
+            price = price + (item["price"] * item["quantity"]) 
+        
+        return render_template('carrito.html', datos=data, check = 1, precio = ("%.2f" % price))
+    return render_template('carrito.html', datos=None, check = 0, precio = None)
 
 @app.route('/pagar', methods=["GET", "POST"])
 def pagar():

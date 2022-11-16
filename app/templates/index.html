@@ -3,28 +3,17 @@
 {% block content %}
 <br></br>
 <br></br>
-<div class="search_bar">
-    <form method="post">
-        <select name="categorias">
-            <option value="">Categoria</option>
-            <option value="Aventura">Aventura</option>
-            <option value="Acción">Accion</option>
-        </select>
-        <input name="titulo" type="text" placeholder="Nombre pelicula">
-        <input type="submit" value="Buscar">
-    </form>
-</div>
 <div class="move_left">
     {% for item in movies %}
     <ul id="film_strip">
         <li>
             <div class="film_text">
-                <a href="{{ url_for('almacen', id=item.id )}}">
-                     {{ item.titulo}}
+                <a href="{{ url_for('almacen', id=item.movieid )}}">
+                     {{ item.movietitle}}
                 </a>
             </div>
-            <a href="{{ url_for('almacen', id=item.id )}}">
-                <img src="{{item.poster}}" alt="{{item.titulo}}" id="{{item.id}}" width="300" height="300" />
+            <a href="{{ url_for('almacen', id=item.movieid )}}">
+                <img src="static/movie{{item.movieid}}.jpg" alt="{{item.titulo}}" id="{{item.movieid}}" width="300" height="300" />
             </a>
         </li>
     </ul>

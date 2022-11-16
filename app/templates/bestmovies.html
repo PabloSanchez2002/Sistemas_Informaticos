@@ -1,0 +1,21 @@
+{% extends "base.html" %} {% block title %} {{ title }} {% endblock%}
+</form>
+{% block content %}
+<div class = "move_left">
+   <form action="" method="post">
+            <input name="year1" type="number" placeholder="Año Inicio">
+            <input name="year2" type="number" placeholder="Año Final">
+            <input name="max" type="number" placeholder="Mostrar">
+            <input type="submit" value="Añadir">
+    {% for item in top %}
+    <ul id="film_strip">
+        <li>
+            <a href="{{ url_for('almacen', id=item[3])}}">
+                     {{ item[1]}}
+            </a>
+        </li>
+        <br></br>
+    </ul>
+    {% endfor %}
+</div>
+{% endblock %}

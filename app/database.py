@@ -12,6 +12,29 @@ db_meta = MetaData(bind=db_engine)
 # cargar una tabla
 db_table_movies = Table('imdb_movies', db_meta, autoload=True, autoload_with=db_engine)
 
+def db_createUser(dict):
+    try:# conexion a la base de datos
+        db_conn = None
+        db_conn = db_engine.connect()
+        x =  db_conn.execute(f"select * from customers where username = '{dict['user']}'")
+        if len(list(x)) > 0:
+            print("AAAAAAAAAAAAAa")
+            return 1
+        db_conn.execute(f"insert into customers(address,email,creditcard,username,password,balance) values('{dict['direccion']}', '{dict['email']}', '{dict['tarjeta']}',\
+            '{dict['user']}', '{dict['contrasena']}', {dict['saldo']})")
+        db_conn.close()
+        return 0
+    except:
+        if db_conn is not None:
+            db_conn.close()
+        print("Exception in DB access:")
+        print("-"*60)
+        traceback.print_exc(file=sys.stderr)
+        print("-"*60)
+
+        return 'Something is broken'
+
+
 def db_topMovies(y1, y2, MAX):
     try:# conexion a la base de datos
         db_conn = None
@@ -21,11 +44,11 @@ def db_topMovies(y1, y2, MAX):
         if len(info) > 10:
             info = info[0:10]
         if len(info) > int(MAX):
-            info = info[0:MAX]
-        for i in info:
-            db_result=db_conn.execute(f"select movieid from imdb_movies where movietitle = '{i[1]}'")
-            print(list(db_result))
-        print(i)
+            info = info[0:int(MAX)]
+        for i in range(len(info)):
+            db_result=db_conn.execute(f"select movieid from imdb_movies where movietitle = '{info[i][1]}'")
+            info[i] = list(info[i])
+            info[i].append(list(db_result)[0][0])
         db_conn.close()
         return info 
     except:
@@ -61,6 +84,140 @@ def db_actMovie(movieid, userid, rating):
 
         return 'Something is broken'
 
+def db_insertCarrito(orderdetail,orderid):
+    try:# conexion a la base de datos
+        db_conn = None
+        db_conn = db_engine.connect()
+        db_conn.execute(f"insert into orderdetail(orderid, prod_id,price,quantity) values\
+            ({orderid},{orderdetail['prod_id']},{orderdetail['price']}, {orderdetail['quantity']})")
+        db_conn.close()
+        return 
+    except:
+        if db_conn is not None:
+            db_conn.close()
+        print("Exception in DB access:")
+        print("-"*60)
+        traceback.print_exc(file=sys.stderr)
+        print("-"*60)
+
+        return 'Something is broken'
+
+def db_getCarrito(username):
+    try:# conexion a la base de datos
+        db_conn = None
+        db_conn = db_engine.connect()
+        tab=db_conn.execute("select od.prod_id, im.movietitle,od.price, od.quantity from orders o join orderdetail od on o.orderid = od.orderid join products p on p.prod_id = od.prod_id join imdb_movies im on im.movieid = p.movieid where customerid='%s' and status is null order by movietitle"%username)
+        db_conn.close()
+        return list(tab)
+    except:
+        if db_conn is not None:
+            db_conn.close()
+        print("Exception in DB access:")
+        print("-"*60)
+        traceback.print_exc(file=sys.stderr)
+        print("-"*60)
+
+        return 'Something is broken'
+
+def db_addMovie(customerid, prod_id, price):
+    try:# conexion a la base de datos
+        db_conn = None
+        db_conn = db_engine.connect()
+        orderid = db_conn.execute("select orderid from orders where status is null and customerid = '%s'"%customerid)
+        orderid = list(orderid)[0][0]
+        order = db_conn.execute(f"select quantity from orderdetail where prod_id = {prod_id} and orderid = {orderid}")
+        quantity = list(order)
+        print(quantity)
+        if len(quantity) == 0:
+            db_conn.execute(f"insert into orderdetail(orderid, prod_id,price,quantity) values\
+                ({orderid},{prod_id},{price}, 1)")
+        else:
+                db_conn.execute(f"update orderdetail set quantity=quantity+1 where prod_id={prod_id}")
+        db_conn.close()
+        return  
+    except:
+        if db_conn is not None:
+            db_conn.close()
+        print("Exception in DB access:")
+        print("-"*60)
+        traceback.print_exc(file=sys.stderr)
+        print("-"*60)
+
+        return 'Something is broken'
+
+
+
+def db_updateCarrito(orderdetail,username):
+    try:# conexion a la base de datos
+        db_conn = None
+        db_conn = db_engine.connect()
+        orderid = db_conn.execute("select orderid from orders where status is null and customerid = '%s'"%username)
+        orderid = list(orderid)[0][0]
+        order = db_conn.execute(f"select quantity from orderdetail where prod_id = {orderdetail['prod_id']} and orderid = {orderid}")
+        quantity = list(order)
+        print(quantity)
+        if len(quantity) == 0:
+            db_conn.execute(f"insert into orderdetail(orderid, prod_id,price,quantity) values\
+                ({orderid},{orderdetail['prod_id']},{orderdetail['price']}, {orderdetail['quantity']})")
+        else:
+            if quantity[0][0] < orderdetail['quantity']:
+                db_conn.execute(f"update orderdetail set quantity={orderdetail['quantity']} where prod_id={orderdetail['prod_id']}")
+        db_conn.close()
+        return  
+    except:
+        if db_conn is not None:
+            db_conn.close()
+        print("Exception in DB access:")
+        print("-"*60)
+        traceback.print_exc(file=sys.stderr)
+        print("-"*60)
+
+        return 'Something is broken'
+
+
+
+def db_createCarrito(username):
+    try:# conexion a la base de datos
+        db_conn = None
+        db_conn = db_engine.connect()
+        db_conn.execute("insert into orders(orderdate, customerid,netamount,tax,totalamount) values\
+            (current_date, '%s',0,21,0)"%username)
+        order = db_conn.execute("select * from orders where status is null and customerid = '%s'"%username)
+        db_conn.close()
+        return  list(order)[0][0] 
+    except:
+        if db_conn is not None:
+            db_conn.close()
+        print("Exception in DB access:")
+        print("-"*60)
+        traceback.print_exc(file=sys.stderr)
+        print("-"*60)
+
+        return 'Something is broken'
+
+
+
+def db_checkCarrito(username):
+    try:# conexion a la base de datos
+        db_conn = None
+        db_conn = db_engine.connect()
+        db_result = db_conn.execute("select * from orders where status is null and customerid = '%s'"%username)
+        if len(list(db_result)) == 0: 
+            db_conn.close()
+            return 0
+        db_conn.close()
+        return 1
+    except:
+        if db_conn is not None:
+            db_conn.close()
+        print("Exception in DB access:")
+        print("-"*60)
+        traceback.print_exc(file=sys.stderr)
+        print("-"*60)
+
+        return 'Something is broken'
+
+
 
 
 def db_getPassword(username):
@@ -86,7 +243,7 @@ def db_getPrice(movieid):
     try:# conexion a la base de datos
         db_conn = None
         db_conn = db_engine.connect()
-        db_result = db_conn.execute("select min(price) from products where movieid = '%s'"%movieid)
+        db_result = db_conn.execute("select description, price, prod_id from products where movieid = '%s'"%movieid)
         info = list(db_result) 
         db_conn.close()
         return  info 

@@ -11,14 +11,11 @@
     
     {% for item in datos%}
     <div class="container">
-        <a href="{{ url_for('almacen', id=item.id )}}">
-            <img src="{{item.poster}}" alt="{{item.titulo}}" id="{{item.id}}" width="60" height="60" />
-        </a>
     </div>
     
-    <label>{{item.titulo}} {{item.precio}}€ x {{item.pedidos}} = {{"%.2f"|format(item.precio * item.pedidos)}}€</label>
+    <label>{{item.movietitle}} {{item.price}}€ x {{item.quantity}} = {{"%.2f"|format(item.price * item.quantity)}}€</label>
     
-    <a href="{{ url_for('carrito', id=item.id)}}">
+    <a href="{{ url_for('carrito', id=item.prod_id)}}">
         <img src="static/cross.png" width="20" height="20" />
     </a>
 

@@ -2,30 +2,53 @@
 </form>
 {% block content %}
 <div class="move_left">
-    <img src="{{movie.poster|safe}}" alt="{{movie.titulo}}" id="{{movie.id}}" width="30%" height="25%" />
+    <img src="static/movie{{id}}.jpg" alt="{{movietitle}}" id="{{id}}" width="30%" height="25%" />
     <div class="movie_text">
         <h3>
-            {{ movie.titulo}}
+            {{movietitle}}
         </h3>
-        Director: {{ movie.director }}
-
-        <br></br>
-        <br></br>
-        Actores: {% for item in movie.actores %}
+        Director: {% for item in directors%}
         <div class="div_identa">
-            {{ item.nombre}}: {{item.personaje}}
+            {{ item[0]}}
         </div>
+
         {% endfor %}
         <br></br>
+        <br></br>
+        Actores: {% for item in actors%}
+        <div class="div_identa">
+            {{ item[0]}}: {{item[1]}}
+            <br></br>
+        </div>
+        {% endfor %}
         <div> Valoracion: {%for i in range(valoracion)%}
             <span>⭐</span> {% endfor %}
         </div>
+        Generos: {% for item in genre%}
+        <div class="div_identa">
+            {{ item[0]}}
+        </div>
+        {% endfor %}
         <br></br>
-        <br></br>
-        <br></br>
-        Categoria: {{movie.categoria}}
-        <br></br>
-        Precio: {{movie.precio}} €
+        </p> El stock para esta pelicula es de: {{stock}} copias</p>
+        Precios: {% for item in prices%}
+        <div class="div_identa">
+            {{loop.index}}:{{ item[0]}}: {{item[1]}}€
+        </div>
+        {% endfor %}
+        <div class="review_bar">
+            <div>Añadir tipo de producto al carrito</div>
+            <form action="" , method="post">
+                <select name="tipopelicula">
+                        <option value="-1">Nada</option>
+                    {% for item in prices %}
+                        <option value="{{loop.index}}">{{loop.index}}</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="Anadir al carrito">
+            </form>
+        </div>
+ 
         <br></br>
         <br></br>
         {% if not session['usuario'] %}
@@ -53,14 +76,9 @@
                 <input type="submit" value="Valorar">
             </form>
         </div>
+        </div>
         {% endif%}
-    </p> El stock para esta pelicula es de: {{stock}} copias</p>
-        <form action="" method="post">
-            <label><b>Añadir al carrito</b></label>
-            <input name="valor" type="number" placeholder="Enter units">
-            <input type="submit" value="Añadir">
-
-    </div>
+    
 
 
 
