@@ -1,6 +1,8 @@
 --Hacemos las llamadas necsarias para los procedimientos almacenados
 \i updOrders.sql
+\i updRatings.sql
 \i setOrderAmount.sql
+
 
 --Añadimos valor balance a customer
 ALTER TABLE customers ADD COLUMN balance int;
@@ -14,11 +16,14 @@ CREATE TABLE ratings (
 );
 
 --Llamada para generar los procedimientos almacenados de ratings
-\i updRatings.sql
 
 --Añadimos columnas a tabla imdb_movies
-ALTER TABLE imdb_movies ADD COLUMN ratingmean int DEFAULT 0;
-ALTER TABLE imdb_movies ADD COLUMN ratingcount int DEFAULT 0;
+ALTER TABLE imdb_movies ADD COLUMN ratingmean ;
+ALTER TABLE imdb_movies ADD COLUMN ratingcount ;
+
+update imdb_movies set ratingmean = 0;
+update imdb_movies set ratingcount = 0;
+update imdb_movies set movierelease = year
 
 --Cambiamos el tipo de password a 96 caracteres
 ALTER TABLE customers ALTER COLUMN password TYPE character varying(96);
