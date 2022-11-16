@@ -34,6 +34,26 @@ def db_createUser(dict):
 
         return 'Something is broken'
 
+def db_deleteMovie(customerid, prod_id):
+    try:# conexion a la base de datos
+        db_conn = None
+        db_conn = db_engine.connect()
+        orderid = db_conn.execute("select orderid from orders where status is null and customerid = '%s'"%customerid)
+        orderid = list(orderid)[0][0]
+        db_conn.execute(f"delete from orderdetail where orderid = {orderid} and prod_id = {prod_id}")
+        db_conn.close()
+        return 0
+    except:
+        if db_conn is not None:
+            db_conn.close()
+        print("Exception in DB access:")
+        print("-"*60)
+        traceback.print_exc(file=sys.stderr)
+        print("-"*60)
+
+        return 'Something is broken'
+
+
 
 def db_topMovies(y1, y2, MAX):
     try:# conexion a la base de datos
@@ -194,6 +214,76 @@ def db_createCarrito(username):
         print("-"*60)
 
         return 'Something is broken'
+
+
+def db_getSaldo(username):
+    try:# conexion a la base de datos
+        db_conn = None
+        db_conn = db_engine.connect()
+        db_result = db_conn.execute("select balance from customers where customerid = '%s'"%username)
+        db_conn.close()
+        return list(db_result)[0][0]
+    except:
+        if db_conn is not None:
+            db_conn.close()
+        print("Exception in DB access:")
+        print("-"*60)
+        traceback.print_exc(file=sys.stderr)
+        print("-"*60)
+
+        return 'Something is broken'
+
+def db_UpdateShippedPedido(username):
+    try:# conexion a la base de datos
+        db_conn = None
+        db_conn = db_engine.connect()
+        order = db_conn.execute("select * from orders where status is null and customerid = '%s'"%username)
+        order = list(order)[0]
+        orders = db_conn.execute("select * from orderdetail where orderid = '%s'"%order[0])
+        orders = list(orders)
+        for i in orders:
+            stock = db_conn.execute(f"select stock from inventory where prod_id = {i[1]}")
+            stock = list(stock)[0][0]
+            if i[3] > stock:
+                i[3] = stock
+            db_conn.execute(f"update inventory set stock = stock - {i[3]} where prod_id = {i[1]}")
+            db_conn.execute(f"update inventory set sales = sales + {i[3]} where prod_id = {i[1]}")
+        
+        db_conn.execute(f"update orders set status = 'Shipped' where orderid = {order[0]}")
+        db_conn.execute("insert into orders(orderdate, customerid,netamount,tax,totalamount) values\
+            (current_date, '%s',0,21,0)"%username)
+        db_conn.execute(f"update customers set balance = balance - {order[5]} where customerid = {username}")
+        db_conn.close()
+        return 
+    except:
+        if db_conn is not None:
+            db_conn.close()
+        print("Exception in DB access:")
+        print("-"*60)
+        traceback.print_exc(file=sys.stderr)
+        print("-"*60)
+
+        return 'Something is broken'
+
+
+
+def db_getTotal(username):
+    try:# conexion a la base de datos
+        db_conn = None
+        db_conn = db_engine.connect()
+        db_result = db_conn.execute("select totalamount from orders where status is null and customerid = '%s'"%username)
+        db_conn.close()
+        return list(db_result)[0][0]
+    except:
+        if db_conn is not None:
+            db_conn.close()
+        print("Exception in DB access:")
+        print("-"*60)
+        traceback.print_exc(file=sys.stderr)
+        print("-"*60)
+
+        return 'Something is broken'
+
 
 
 
