@@ -39,6 +39,9 @@ $$ LANGUAGE plpgsql;
 --Llamada a funcion setCustomersBalance
 SELECT setCustomersBalance(100);
 
+--Modificamos los titulos de las peliculas y cambiamos las comillas que daban error en las querys de la pagina web
+update imdb_movies set movietitle = replace(movietitle,'''', '`');
+
 --Modificamos las FK existentes para que cumplasn ON DELETE CASCADE
 ALTER TABLE public.imdb_directormovies DROP CONSTRAINT imdb_directormovies_movieid_fkey;
 ALTER TABLE public.imdb_directormovies ADD CONSTRAINT imdb_directormovies_movieid_fkey FOREIGN KEY (movieid) REFERENCES public.imdb_movies(movieid) ON DELETE CASCADE;

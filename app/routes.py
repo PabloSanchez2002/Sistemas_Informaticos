@@ -9,8 +9,7 @@ import traceback
 from app import app
 from flask import render_template, request, url_for, redirect, session
 from app import database
-import hashlib
-import json
+import hashlib 
 import os
 import sys
 import datetime
@@ -192,11 +191,25 @@ def pagar():
 
 @app.route('/historial')
 def historial():
-    if 'usuario' in session:
-        path = os.path.join(app.root_path, "si1users")
-        path = os.path.join(path, str(session['usuario']))
-        path = os.path.join(path, "compras.json")
-        with open(path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            return render_template('historial.html', data=data, pagado = False)
+    if 'usuario' in session:        
+        data = database.db_shoppingHistory(session['userid'])
+        compras = {}
+        compras["compras"] = []
+        for i in data[0]:
+            dict = {}
+            dict['orderid'] = i[0]
+            dict['orderdate'] = i[1]
+            dict['totalamount'] = i[2]
+            dict['status'] = i[3]
+            dict["pelis"] = []
+            for p in data[1]:
+                if p[0] == i[0]:
+                    peli = {}
+                    peli['movietitle'] = p[1]
+                    peli['quantity'] = p[2]
+                    peli['price'] = p[3]
+                    dict["pelis"].append(peli)
+            compras["compras"].append(dict)
+            print()######
+        return render_template('historial.html', data=compras, pagado = False)
     return render_template('index.html')

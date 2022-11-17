@@ -439,9 +439,17 @@ def db_shoppingHistory(username):
         db_conn = None
         db_conn = db_engine.connect()
         db_result = db_conn.execute(
-            "select orderid, orderdate, totalamount, status from orders where username='%s'" % username)
-
+            "select orderid, orderdate, totalamount, status from orders where customerid='%s' and status is not null order by orderid " % username)
+        db_details = db_conn.execute("select orders.orderid, imdb_movies.movietitle, quantity, orderdetail.price from orders join orderdetail on orders.orderid=orderdetail.orderid join products on orderdetail.prod_id=products.prod_id join imdb_movies on products.movieid=imdb_movies.movieid where customerid='%s' order by orders.orderid" % username)
+        info = [list(db_result), list(db_details)]
         db_conn.close()
+        return info
     except:
         if db_conn is not None:
             db_conn.close()
+        print("Exception in DB access:")
+        print("-"*60)
+        traceback.print_exc(file=sys.stderr)
+        print("-"*60)
+
+        return 'Something is broken'
