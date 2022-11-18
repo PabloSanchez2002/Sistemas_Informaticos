@@ -1,22 +1,20 @@
-{% extends "base.html" %} {% block title %} {{ title }} {% endblock%}
-</form>
-{% block content %}
-<br></br>
-<br></br>
-<div class="move_left">
-    {% for item in movies %}
-    <ul id="film_strip">
-        <li>
-            <div class="film_text">
-                <a href="{{ url_for('almacen', id=item.movieid )}}">
-                     {{ item.movietitle}}
-                </a>
-            </div>
-            <a href="{{ url_for('almacen', id=item.movieid )}}">
-                <img src="static/movie{{item.movieid}}.jpg" alt="{{item.titulo}}" id="{{item.movieid}}" width="300" height="300" />
-            </a>
-        </li>
+<!DOCTYPE HTML> 
+<!--
+ SI1 P3
+-->
+<HTML> 
+  <HEAD> 
+	  <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8"> 
+	  <TITLE>SI1 P3</TITLE>
+  </HEAD> 
+
+  <BODY>
+ 
+    <h2> SI1 P3</h2>
+
+    <ul>
+        <li><a href="{{ url_for('topUK') }}">topUK</a></li>
+        <li><a href="{{ url_for('borraEstado') }}">borraEstado</a></li>
     </ul>
-    {% endfor %}
-</div>
-{% endblock %}
+  </BODY>
+</HTML>
