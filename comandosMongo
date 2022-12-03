@@ -1,6 +1,4 @@
  sudo systemctl restart mongod
  systemctl status mongod
  
- psql si1 alumnodb
- drop schema public cascade; 
- create schema public;
+psql si1 alumnodb
