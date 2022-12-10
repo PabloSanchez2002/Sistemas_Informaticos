@@ -12,11 +12,50 @@
  
     <h2> Ejemplo de MongoDB</h2>
 
-    <!-- TODO: tabla de películas Consulta 1 -->
-
-    <!-- TODO: tabla de películas Consulta 2 -->
-
-    <!-- TODO: tabla de películas Consulta 3 -->
+    {% for movie_table in movies%}
+    <table class="table">
+      {% if loop.first %}
+      <caption>
+        <p class="table-title"><b>Peliculas de comedia entre 1990 y 1992:</b></p>
+      </caption>
+      {% elif not loop.last %}
+      <caption>
+        <p class="table-title"><b>Peliculas de acción del 1995, 1997 y 1998 que empiezan por 'The':</b></p>
+      </caption>
+      {% else %}
+      <caption>
+        <p class="table-title"><b>Peliculas protagonizadas por Darren McAree y Katie Lockett:</b></p>
+      </caption>
+      {% endif %}
+      <tr>
+        <th>Titulo</th>
+        <th>Generos</th>
+        <th>Anno</th>
+        <th>Directores</th>
+        <th>Actores</th>
+        <th>Peliculas relacionadas</th>
+      </tr>
+      {% for movie in movie_table %}
+      <tr>
+        <td>{{ movie.title }}</td>
+        <td>{{ movie.genres|join('\n') }}</td>
+        <td>{{ movie.year }}</td>
+        <td>{{ movie.directors|join('\n') }}</td>
+        <td>{{ movie.actors|join('\n') }}</td>
+        <td>
+        <td><!--
+          <ul>
+            {% for m in movie.related_movies %}
+            <li>{{ m.title }} - {{ m.year }}</li>
+            {% endfor %}
+          </ul>
+          -->
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+    <hr>
+    {% endfor %}
 
   </BODY>
 </HTML>

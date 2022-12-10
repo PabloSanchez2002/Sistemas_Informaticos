@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import pymongo
 from app import app
 from app import database
 from flask import render_template, request, url_for
@@ -31,5 +32,20 @@ def borraEstado():
 @app.route('/topUK', methods=['POST','GET'])
 def topUK():
     # TODO: consultas a MongoDB ...
-    movies=[[],[],[]]
+    colUK = database.getMongoCollection(database.mongo_client)
+    
+    
+    query_a = {"genres": "Comedy", "year": {"$gt": 1990, "$lt": 1992}}
+    result_a = colUK.find(query_a)
+    movies_a = [mov for mov in result_a]
+
+    query_b = {"$or": [{"year": 1995}, {"year": 1997}, {"year": 1998}], "title": {"$regex": '^.*, The'}, "genres": "Action"}
+    result_b = colUK.find(query_b)
+    movies_b = [mov for mov in result_b]
+
+    query_c = {"$and": [{"actors": "McAree, Darren"}, {"actors": "Lockett, Katie"}]}
+    result_c = colUK.find(query_c)
+    movies_c = [mov for mov in result_c]
+
+    movies = [movies_a, movies_b, movies_c]
     return render_template('topUK.html', movies=movies)

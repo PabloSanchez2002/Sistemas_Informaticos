@@ -1,4 +1,0 @@
- sudo systemctl restart mongod
- systemctl status mongod
- 
-psql si1 alumnodb
